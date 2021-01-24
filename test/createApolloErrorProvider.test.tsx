@@ -1,7 +1,7 @@
 import React from 'react';
 import { createApolloErrorProvider } from '../src';
-import { render, waitForDomChange } from '@testing-library/react';
-import { TodoApp } from './fixtures/Todo';
+import { render, waitFor } from '@testing-library/react';
+import { TodoApp } from './Todo';
 import { GraphQLError } from 'graphql';
 
 test('works with defaults', async () => {
@@ -12,10 +12,11 @@ test('works with defaults', async () => {
         new GraphQLError('Something terrible happened on the way to the moon.'),
       ]}
     >
-      <TodoApp />
+      <TodoApp id={'hello'} />
     </MockedProvider>
   );
 
-  await waitForDomChange();
-  expect(getByText('Error!', { exact: false })).toBeTruthy();
+  await waitFor(() =>
+    expect(getByText('Error!', { exact: false })).toBeTruthy()
+  );
 });
