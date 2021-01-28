@@ -1,21 +1,24 @@
 import { OrderStatus } from '@chocoapp/appsync-client';
-import React, { FC } from 'react';
+import React, { FC, useState } from 'react';
+import useBatchOrderConfirmMutation from './data/useBatchOrderConfirmMutation';
 
 type StatusProps = {
   status: OrderStatus;
   orderId?: string;
 };
 
-const NewStatus: FC<StatusProps> = ({ status, orderId }) => {
-  const [orderConfirmMutation] = useBatchOrderConfirmMutation([orderId]);
+const OrderConfirm: FC<StatusProps> = ({ status, orderId }) => {
+  const [orderConfirmData, setOrderConfirmData] = useState<any>(undefined);
+  const [orderConfirmMutation] = useBatchOrderConfirmMutation([orderId || '']);
 
-  const onClickConfirmOrder = async event => {
+  const onClickConfirmOrder = async (event: any) => {
     event.stopPropagation();
 
     if (!orderId) return;
 
     try {
-      await orderConfirmMutation();
+      const { data } = await orderConfirmMutation();
+      setOrderConfirmData(data);
     } catch (error) {}
   };
 
@@ -26,8 +29,9 @@ const NewStatus: FC<StatusProps> = ({ status, orderId }) => {
       ) : (
         <div onClick={onClickConfirmOrder}>confirmOrder</div>
       )}
+      {JSON.stringify(orderConfirmData)}
     </div>
   );
 };
 
-export default NewStatusZ;
+export default OrderConfirm;

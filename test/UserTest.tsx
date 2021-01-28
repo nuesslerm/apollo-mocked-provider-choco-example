@@ -22,9 +22,11 @@ export interface GetUser {
 }
 
 const UserTest = ({ id }: { id: string }) => {
-  const { loading, error, data } = useQuery<GetUser>(GET_USER_QUERY, {
+  const { data, error, loading } = useQuery<GetUser>(GET_USER_QUERY, {
     variables: { id },
   });
+
+  // console.log(data, error, loading);
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error! ({error.message})</p>;

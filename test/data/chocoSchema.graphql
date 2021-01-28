@@ -1,450 +1,33 @@
-"""
-This directive allows results to be deferred during execution
-"""
-directive @defer on FIELD
-
-"""
-Tells the service which mutation triggers this subscription.
-"""
-directive @aws_subscribe(
-  """
-  List of mutations which will trigger this subscription when they are called.
-  """
-  mutations: [String]
-) on FIELD_DEFINITION
-
-"""
-Tells the service this field/object has access authorized by sigv4 signing.
-"""
-directive @aws_iam on OBJECT | FIELD_DEFINITION
-
-"""
-Tells the service which subscriptions will be published to when this mutation is
-called. This directive is deprecated use @aws_susbscribe directive instead.
-"""
-directive @aws_publish(
-  """
-  List of subscriptions which will be published to when this mutation is called.
-  """
-  subscriptions: [String]
-) on FIELD_DEFINITION
-
-"""
-Directs the schema to enforce authorization on a field
-"""
-directive @aws_auth(
-  """
-  List of cognito user pool groups which have access on this field
-  """
-  cognito_groups: [String]
-) on FIELD_DEFINITION
-
-"""
-Tells the service this field/object has access authorized by an OIDC token.
-"""
-directive @aws_oidc on OBJECT | FIELD_DEFINITION
-
-"""
-Tells the service this field/object has access authorized by an API key.
-"""
-directive @aws_api_key on OBJECT | FIELD_DEFINITION
-
-"""
-Tells the service this field/object has access authorized by a Cognito User Pools token.
-"""
-directive @aws_cognito_user_pools(
-  """
-  List of cognito user pool groups which have access on this field
-  """
-  cognito_groups: [String]
-) on OBJECT | FIELD_DEFINITION
-
-union ActivateChatResponse = Chat
-
-enum AddressSource {
-  google
-  custom
-}
-
-input AdminProductInput {
-  name: String
-  enabled: Boolean
-  supplierId: ID
-  externalId: ID
-  unit: String
-  par: String
-  category: String
-  price: String
-  cost: String
-  currency: String
-  primaryCatalogCategory: String
-  leadTime: Int
-  cutOffTime: AWSTime
-  description: String
-}
-
-interface AppsyncError {
-  responseType: ResponseType!
-  message: String
-}
-
-interface AppsyncResponse {
-  responseType: ResponseType!
-}
-
-union Attachment = Event | Media
-
-"""
-The `AWSEmail` scalar type provided by AWS AppSync, represents an Email address
-string that complies with [RFC 822](https://www.ietf.org/rfc/rfc822.txt). For
-example, "**username@example.com**" is a valid Email address.
-"""
-scalar AWSEmail
-
-"""
-The `AWSTime` scalar type provided by AWS AppSync, represents a valid
-***extended*** [ISO 8601 Time](https://en.wikipedia.org/wiki/ISO_8601#Times)
-string. In other words, this scalar type accepts time strings of the form
-`hh:mm:ss.SSS`.  The field after the two digit seconds field is a nanoseconds
-field. It can accept between 1 and 9 digits. So, for example, "**12:00:00.2**",
-"**12:00:00.277**" and "**12:00:00.123456789**" are all valid time strings. The
-seconds and nanoseconds fields are optional (the seconds field must be specified
-if the nanoseconds field is to be used).  This scalar type can also accept an
-optional [time zone
-offset](https://en.wikipedia.org/wiki/ISO_8601#Time_zone_designators). For
-example, "**12:30**", "**12:30Z**", "**12:30:24-07:00**" and
-"**12:30:24.500+05:30**" are all valid time strings. The time zone offset must
-either be `Z` (representing the UTC time zone) or be in the format `±hh:mm:ss`.
-The seconds field in the timezone offset will be considered valid even though it
-is not part of the ISO 8601 standard.
-"""
+scalar AWSDate
 scalar AWSTime
-
-"""
-The `AWSTimestamp` scalar type provided by AWS AppSync, represents the number of
-seconds that have elapsed since `1970-01-01T00:00Z`. Negative values are also
-accepted and these represent the number of seconds till `1970-01-01T00:00Z`.
-Timestamps are serialized and deserialized as integers. The minimum supported
-timestamp value is **`-31557014167219200`** which corresponds to
-`-1000000000-01-01T00:00Z`. The maximum supported timestamp value is
-**`31556889864403199`** which corresponds to
-`1000000000-12-31T23:59:59.999999999Z`.
-"""
+scalar AWSDateTime
 scalar AWSTimestamp
+scalar AWSEmail
+scalar AWSJSON
+scalar AWSURL
+scalar AWSPhone
+scalar AWSIPAddress
 
-type BatchUpdateOrderSupplier {
-  chatId: String
-  supplierId: String
-  orderCount: Int
-}
+directive @aws_api_key on SCHEMA | OBJECT | INPUT_OBJECT | FIELD_DEFINITION
 
-input BatchUpdateOrderSupplierInput {
-  chatId: String!
-  supplierId: String!
-  supplierRefId: String!
-  supplierPhone: String!
-}
+directive @aws_iam on SCHEMA | OBJECT | INPUT_OBJECT | FIELD_DEFINITION
 
-type BlockedEmail implements Node {
-  id: ID!
-  email: String!
-  reason: String
-  createdAt: AWSTimestamp
-}
+directive @aws_oidc on SCHEMA | OBJECT | INPUT_OBJECT | FIELD_DEFINITION
 
-type BlockedEmailConnection implements Connection {
-  edges: [BlockedEmailEdge!]
-}
+directive @aws_cognito_user_pools on SCHEMA | OBJECT | INPUT_OBJECT | FIELD_DEFINITION
 
-type BlockedEmailEdge implements Edge {
-  cursor: String!
-  node: BlockedEmail!
-}
+directive @aws_subscribe(
+  mutations: [String]
+) on SCHEMA | OBJECT | INPUT_OBJECT | FIELD_DEFINITION
 
-type Broadcast implements Node {
-  id: ID!
-  message: String
-  chatIds: [ID!]
-  chatLabels: [String!]
-  productIds: [String!]
-  products(offset: Int, size: Int): [Product!]
-  chats(offset: Int, size: Int): [Chat!]
-  createdAt: AWSTimestamp
-  status: BroadcastStatus!
-  senderUserId: ID
-  sender: User
-  supplierEntityId: ID
-  recipientCount: Int
-  attachment: Attachment
-}
-
-type BroadcastAttachmentProducts {
-  products: [Product!]
-  categories: [ProductCategory!]
-}
-
-input BroadcastFilter {
-  status: [BroadcastStatus]
-  senderUserId: ID
-  supplierEntityId: ID
-}
-
-input BroadcastInput {
-  message: String
-  chatIds: [ID!]
-  chatLabels: [String!]
-  productIds: [String!]
-  sendToAll: Boolean
-  status: BroadcastStatus!
-  media: Boolean
-  mediaContentType: String
-}
-
-enum BroadcastStatus {
-  draft
-  processing
-  sent
-  archived
-}
-
-type Buyer implements Node {
-  id: ID!
-  name: String!
-  referenceId: String
-  isTest: Boolean
-  fullAddress: String!
-  addressSource: AddressSource!
-  googlePlaceId: String
-  latitude: Float
-  longitude: Float
-  city: String
-  country: String
-  utcOffset: Int
-  deliveryComment: String
-  createdAt: AWSTimestamp!
-  users(first: Int, after: String): BuyerUserConnection
-}
-
-input BuyerCreateInput {
-  name: String!
-  fullAddress: String!
-  addressSource: AddressSource!
-  googlePlaceId: String
-  latitude: Float
-  longitude: Float
-  city: String
-  country: String
-  utcOffset: Int
-  deliveryComment: String
-  isTest: Boolean
-}
-
-input BuyerUpdateInput {
-  name: String
-  fullAddress: String
-  addressSource: AddressSource
-  googlePlaceId: String
-  latitude: Float
-  longitude: Float
-  city: String
-  country: String
-  utcOffset: Int
-  deliveryComment: String
-  isTest: Boolean
-}
-
-type BuyerUser {
-  buyerId: String!
-  userId: String!
-}
-
-type BuyerUserConnection implements Connection {
-  edges: [BuyerUserEdge!]!
-}
-
-type BuyerUserEdge implements Edge {
-  cursor: String!
-  node: User!
-}
-
-input CategoryInput {
-  id: ID!
-  name: String
-}
-
-type CategoryProducts implements Node {
-  id: ID!
-  name: String
-  products: [Product!]
-}
-
-type Chat implements Node {
-  id: ID!
-  chatName: String
-  restaurantName: String
-  deliveryAddress: String
-  buyer: Buyer
-  supplier: User
-  customerNumber: String
-  messages(
-    after: String
-    before: String
-    first: Int
-    last: Int
-  ): ChatMessageConnection!
-  users(first: Int, after: String): ChatUserConnection!
-  products: [Product!]
-  additionalEmails: [String]
-  enabled: Boolean!
-  salesforceId: String
-  status: ChatStatus!
-  type: ChatType
-  labels: [String!]
-  supplierCustomerName: String
-}
-
-input ChatCreateInput {
-  userIds: [ID]!
-  chatName: String
-  restaurantName: String
-  deliveryAddress: String
-  buyerId: ID
-  supplierId: ID
-  customerNumber: String
-  additionalEmails: [String]
-  status: ChatStatus
-  salesforceId: String
-  type: ChatType
-  products: [AdminProductInput!]
-  supplierCustomerName: String
-}
-
-input ChatFilter {
-  chatName: String
-  restaurantName: String
-  labels: [String!]
-  supplierEntityId: String
-  userId: String
-  additionalEmail: String
-}
-
-input ChatInviteInput {
-  userName: String
-  smsMessage: String
-  restaurantName: String
-  deliveryAddress: String
-  customerNumber: String
-  googlePlaceId: String
-  googlePlaceName: String
-  products: [AdminProductInput!]
-}
-
-type ChatLabelsResult {
-  label: String
-  count: Int
-}
-
-type ChatMessageConnection implements Connection {
-  edges: [ChatMessageEdge!]
-}
-
-type ChatMessageEdge implements Edge {
-  cursor: String!
-  node: Message!
-}
-
-input ChatNotificationInput {
-  id: ID!
-  newOrder: ChatNotificationUserListsInput
-}
-
-type ChatNotificationPreferences {
-  id: ID!
-  newOrder: ChatNotificationUserLists
-}
-
-type ChatNotificationUserLists {
-  deselectedUsersList: [ID!]!
-  deselectedUsers: [User!]!
-  extraUsersList: [ID!]
-  extraUsers: [User!]
-}
-
-input ChatNotificationUserListsInput {
-  deselectedUsersList: [ID!]!
-  extraUsersList: [ID!]
-}
-
-enum ChatStatus {
-  active
-  archived
-  pending
-}
-
-enum ChatType {
-  ordering
-  support
-}
-
-input ChatUpdateInput {
-  chatName: String
-  restaurantName: String
-  deliveryAddress: String
-  supplierId: ID
-  customerNumber: String
-  additionalEmails: [String]
-  status: ChatStatus
-  salesforceId: String
-  labels: [String!]
-}
-
-type ChatUser {
-  userId: String
-  chatId: String
-}
-
-type ChatUserConnection implements Connection {
-  edges: [ChatUserEdge!]
-}
-
-type ChatUserEdge implements Edge {
-  cursor: String!
-  node: User!
-}
+"Marks an element of a GraphQL schema as no longer supported."
+directive @deprecated(
+  "Explains why this element was deprecated, usually also including a suggestion for how to access supported similar data. Formatted using the Markdown syntax, as specified by [CommonMark](https://commonmark.org/)."
+  reason: String = "No longer supported"
+) on SCHEMA | OBJECT | INPUT_OBJECT | FIELD_DEFINITION | INPUT_FIELD_DEFINITION | ENUM_VALUE
 
 interface Connection {
   edges: [Edge!]
-}
-
-type Contact {
-  phone: String!
-  ownerId: ID!
-  user: User!
-  Image: String
-}
-
-input CreatePushEndpointInput {
-  type: PushNotificationPlatform!
-  token: String!
-  message: Boolean!
-  order: Boolean!
-}
-
-type CutOffTime {
-  type: CutOffTimeType!
-  time: AWSTime!
-  timezone: String!
-}
-
-input CutOffTimeInput {
-  type: CutOffTimeType!
-  time: AWSTime!
-  timezone: String!
-}
-
-enum CutOffTimeType {
-  strict
-  flexible
 }
 
 interface Edge {
@@ -452,148 +35,164 @@ interface Edge {
   node: Node!
 }
 
-type Event {
-  eventType: EventType!
-  target: [EventTarget]
-}
-
-type EventChat {
-  chatId: ID
-  restaurantName: String
-  chatName: String
-  supplier: EventUser
-}
-
-union EventTarget = EventUser | EventChat
-
-enum EventType {
-  userRemovedFromChat
-  userAddedToChat
-  chatNameUpdated
-  chatCreated
-}
-
-type EventUser {
-  id: ID
-  phone: String
-  name: String
-}
-
-union GetInviteeBuyersResponse = InviteeNotFound | InviteeBuyers
-
-union GetUnconnectedBuyerIdsResult = UnconnectedBuyers | NoUnconnectedBuyers
-
-type ImportSupplierProductsReport {
-  new: Int
-  disabled: Int
-  invalid: Int
-  updated: Int
-  unchanged: Int
-}
-
-type IntegrationEmailOption {
-  type: IntegrationType!
-  emailAddress: String!
-  xlsx: Boolean!
-  pdf: Boolean!
-}
-
-input IntegrationEmailOptionInput {
-  type: IntegrationType!
-  emailAddress: String!
-  xlsx: Boolean!
-  pdf: Boolean!
-}
-
-type IntegrationFaxOption {
-  type: IntegrationType!
-  phone: String!
-}
-
-input IntegrationFaxOptionInput {
-  type: IntegrationType!
-  phone: String!
-}
-
-union IntegrationOption =
-    IntegrationSmsOption
-  | IntegrationEmailOption
-  | IntegrationFaxOption
-  | IntegrationWhatsAppOption
-
-input IntegrationOptionInput {
-  sms: IntegrationSmsOptionInput
-  email: IntegrationEmailOptionInput
-  fax: IntegrationFaxOptionInput
-  whatsApp: IntegrationWhatsAppOptionInput
-}
-
-type IntegrationSmsOption {
-  type: IntegrationType!
-  phone: String!
-}
-
-input IntegrationSmsOptionInput {
-  type: IntegrationType!
-  phone: String!
-}
-
-enum IntegrationType {
-  sms
-  email
-  fax
-  whatsApp
-}
-
-type IntegrationWhatsAppOption {
-  type: IntegrationType!
-  phone: String!
-}
-
-input IntegrationWhatsAppOptionInput {
-  type: IntegrationType!
-  phone: String!
-}
-
-type InviteeBuyers {
+interface Node {
   id: ID!
-  unconnectedBuyers(first: Int, after: String): UserBuyerConnection
 }
 
-type InviteeNotFound implements AppsyncResponse & AppsyncError {
-  responseType: ResponseType!
-  message: String
+type PageInfo @aws_cognito_user_pools @aws_iam @aws_oidc {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String!
+  endCursor: String!
 }
 
-type Media {
-  url: String
-  uploadUrl: String
-  contentType: String
+type Query @aws_cognito_user_pools @aws_iam @aws_oidc {
+  broadcast(id: ID!): Broadcast!
+  buyer(id: ID, googlePlaceId: String): Buyer
+  buyerUsers(buyerId: ID, userId: ID, first: Int, after: String): [BuyerUser!]!
+  buyerFacets: [BuyerFacetsResponse!]
+  chat(id: ID, userIds: [ID]): Chat
+  chats(
+    userId: ID
+    after: String
+    before: String
+    first: Int
+    last: Int
+  ): UserChatConnection!
+  supplierChatLabels(
+    size: Int
+    after: String
+    asBotUser: Boolean
+  ): [ChatLabelsResult!]
+  message(id: ID!): Message
+  messages(
+    chatId: ID!
+    after: String
+    before: String
+    first: Int
+    last: Int
+  ): ChatMessageConnection!
+  """
+  Get individual order by id or referenceId
+  Only one identifier should be provided
+  """
+  order(id: ID, referenceId: String): Order
+  chatProducts(chatId: ID!): [Product!]
+  exportSupplierProducts(supplierId: ID!): [Product!]!
+  categoryProducts(chatId: ID!): [CategoryProducts!]!
+  user(id: ID, phone: String): User
+  userSearch(
+    first: Int
+    after: String
+    query: UserSearchInput!
+  ): UserSearchResponse!
+  supplier(id: ID, referenceId: String, botUserId: String): Supplier
+  search(query: SearchInput!): SearchResult!
+  orderSearch(query: OrderSearchInput!): OrderSearchResult!
+  isUserInChat(userId: ID!, chatId: ID!): Boolean!
+  bulkOrderPdf(orderIds: [ID!]!, downloadable: Boolean = false): String!
+  productListCategories(chatId: ID!): [ProductCategory!]
+  countSupplierChats(
+    supplierEntityId: String!
+    labels: [String!]
+    userId: String
+  ): Int!
+  sharedBroadcastProducts(
+    broadcastId: ID!
+    chatId: ID!
+  ): SharedBroadcastProducts
+
+  "only admin can access the blocked email"
+  blockedEmail(email: String!): BlockedEmail
+
+  "The max number of first is 30"
+  blockedEmails(first: Int, after: String): BlockedEmailConnection
+  """
+  As a supplier: check if an invitee already has a choco account
+  If no: returns UserNotFound type
+  If yes: returns paginated list of buyers the invitee is connected to
+  that the supplier does not have a chat with.
+  """
+  getInviteeBuyers(phone: String!): GetInviteeBuyersResponse
+  "Get supplier order preferences"
+  chatNotificationPreferences(id: ID!): ChatNotificationPreferences
+  supplierDeliverySetting(id: ID!): SupplierDeliverySetting
+  supplierNewOrderCheck(order: NewOrderInput!): SupplierNewOrderCheckResult!
+  supplierDeliveryDateSettings(
+    chatId: ID!
+  ): SupplierDeliveryDateSettingsResponse
+  """
+  For internal use, submit list of buyer ids and a supplier id
+  Returns which buyers the supplier does not have a chat with
+  """
+  getUnconnectedBuyerIds(
+    buyerIds: [String!]!
+    supplierId: String!
+  ): GetUnconnectedBuyerIdsResult!
+  """
+  For use during the by a supplier invitation flow
+  Returns true if there is no buyer with a matching googlePlaceId
+  Returns true if there is a buyer with a matching googlePlaceId
+  and the supplier does not have a chat with that buyer
+  Returns false if a buyer exists with a matching googlePlaceId
+  and the supplier already has a chat with that buyer
+  """
+  checkInviteeGooglePlace(googlePlaceId: String!): Boolean!
+  metaLobby(after: String, first: Int): MetaLobbyResponse
+
+  """
+  For internal use,
+  - fetch list of messages which are not sent via email and chat
+  - fetch last messages from chat
+  This two queries are executed from choco-notification only
+  Return type is kept exactly similar to the table schema since it is used as is in choco-notification
+  """
+  messagesNotSentViaEmailAndChat(
+    chatId: ID!
+    isSupplier: Boolean!
+  ): [MessagesFromChatResult!]!
+  getLastMessageFromChat(chatId: ID!): MessagesFromChatResult
+  listSubCatalogProducts(
+    input: ListSubCatalogProductsInput!
+  ): ListSubCatalogProductsResponse
+  getSubCatalog(id: ID!): GetSubCatalogResponse
+  """
+  ACL: Choco Admin, SupplierAdmins && SupplierSalesReps
+  supplierEntityId can be undefined when it's requested by a supplier user
+  """
+  listSubCatalogs(
+    supplierEntityId: String
+    first: Int
+    after: String
+  ): ListSubCatalogsResponse
+
+  """
+  The query will currently be used to obtain chats for both buyer chats and user chats
+  """
+  userChats(
+    after: String
+    before: String
+    first: Int
+    last: Int
+    buyerId: ID
+  ): UserChatsResponse!
+
+  """
+  Get all transmission events of an order (ofId=orderId). Sorted by timestamp (descending).
+  """
+  transmissionEvents(ofId: ID!): [TransmissionEvent!]!
+  "return a sub catalog of chat, ACL: chat user"
+  chatSubCatalogProducts(
+    input: ChatSubCatalogProductsInput
+  ): ChatSubCatalogProductsResponse!
+
+  """
+  For internal use, retrieves the order preference of a supplier
+  """
+  getOrderPreference(id: ID!): OrderPreference
 }
 
-type Message implements Node {
-  id: ID!
-  body: String!
-  createdAt: AWSTimestamp!
-  user: User!
-  order: Order
-  chat: Chat!
-  attachment: Attachment
-  broadcastId: ID
-  products: [Product!]
-}
-
-input MessageInput {
-  id: ID!
-  body: String!
-  supplierOptIn: Boolean
-  media: Boolean
-  mediaContentType: String
-  type: String
-  broadcastId: String
-}
-
-type Mutation {
+type Mutation @aws_cognito_user_pools @aws_iam @aws_oidc {
   addLabelToChats(label: String!, chatIds: [ID!]!): Boolean!
   removeLabelFromChats(label: String!, chatIds: [ID!]!): Boolean!
   broadcastCreate(broadcastInput: BroadcastInput!): Broadcast!
@@ -602,10 +201,26 @@ type Mutation {
   buyerUpdate(id: ID!, buyer: BuyerUpdateInput!): Buyer!
   buyerAddUser(buyerId: ID!, userId: ID!): BuyerUser!
   buyerRemoveUser(buyerId: ID!, userId: ID!): BuyerUser!
+  createProfile(user: CreateProfileInput!): CreateProfileResponse!
+  """
+  For internal use, to update the supplier of
+  all orders associated with a chat
+  """
   batchUpdateOrderSupplier(
     input: BatchUpdateOrderSupplierInput!
   ): BatchUpdateOrderSupplier
+  """
+  For internal use, to update the supplier of
+  a chat
+  """
   chatUpdateMainSupplier(chatId: ID!, supplierId: ID!): Boolean!
+  """
+  Admin only,
+  to update the main supplier of a chat
+  - migrate order to new supplier (bot user)
+  - add the new supplier into the chat
+  - remove the old supplier out the chat
+  """
   chatMainSupplierMigrate(chatId: ID!, supplierUserId: ID!): Boolean!
   chatCreate(chat: ChatCreateInput!): Chat!
   supplierInviteUsers(
@@ -628,16 +243,27 @@ type Mutation {
   notificationPreferencesUpdate(
     input: NotificationPreferencesInput
   ): NotificationPreferences
+  """
+  For internal use, to update a users
+  notificationPreferences ID when a users role is updated
+  """
   updateNotificationUserId(
     oldUserId: ID!
     newUserId: ID!
   ): NotificationPreferences
+  "create endpoint for receiving mobile push notifications"
   createPushEndpoint(input: CreatePushEndpointInput): PushEndpointResponse
   orderConfirm(id: ID!): Message
+  batchOrderConfirm(ids: [ID!]!): BatchOrderConfirmResponse
   orderCreate(chatId: ID!, order: OrderInput!): Order!
   productCreate(chatId: ID!, product: ProductInput!): Product!
+  "par and category are forbidden"
   createSupplierProduct(product: ProductInput!): Product!
   deleteSupplierProduct(ids: [ID!]): [ID!]
+  """
+  Allow admin to remove entire supplier products, the return number is meaningless
+  Be aware: the operation is an async processing. The products will be removed in backgroud one by one.
+  """
   deleteEntireSupplierProduct(id: ID!): Int
   updateSupplierProduct(
     id: ID!
@@ -707,59 +333,689 @@ type Mutation {
     supplierId: ID!
     orderConfig: OrderExportConfigUpdateInput!
   ): OrderExportConfig!
+  "Allow SupplierAdmins to remove user (supplierAdmin/SalesReps) from team"
   supplierRemoveUser(userId: String!): User!
   addUserToChats(userId: ID!, chatIds: [ID!]!): Boolean!
   activateChat(chatId: ID!, buyerId: ID!): ActivateChatResponse!
+
+  "Remove an email from the 'chat.additionalEmails' list across all chats"
   removeCCEmailFromChats(email: AWSEmail!): RemoveCCEmailFromChatsReport!
+  "Only admin can remove the blocked email and the return is a null"
   removeBlockedEmail(email: String!): Int
   updateChatNotificationPreferences(
     input: ChatNotificationInput
   ): ChatNotificationPreferences
+  "Admin/Supplier Admin only"
   updateSupplierDeliverySetting(
     input: SupplierDeliverySettingInput!
   ): SupplierDeliverySetting
+
   orderCreateV2(chatId: ID!, order: OrderInput!): OrderCreatedResponse
+  removeUserFromChats(userId: ID!, chatIds: [ID!]!): Boolean!
+  updateSubCatalog(id: ID!, name: String!): updateSubCatalogResponse
+  createSubCatalog(
+    name: String!
+    supplierEntityId: String
+  ): createSubCatalogResponse
+  "Admin Only, confirm pending users on cognito"
+  userConfirm(phone: String!, newUserPool: Boolean!): Boolean!
+  uploadSubCatalogProducts(
+    subCatalogId: ID!
+    csv: String!
+  ): UploadSubCatalogProductsResponse!
 }
 
-input NewOrderInput {
-  id: ID
-  chatId: ID!
-  supplierId: ID!
-  userId: ID!
-  supplierRefId: ID
-  body: String
-  deliveryDate: AWSTimestamp
-  orderProducts: [OrderProductInput]
+type UploadSubCatalogProductsResult @aws_cognito_user_pools @aws_iam @aws_oidc {
+  success: Boolean!
+  submittedProductsCount: Int!
 }
 
-interface Node {
+type UploadSubCatalogProductsError implements AppsyncResponse & AppsyncError
+  @aws_cognito_user_pools
+  @aws_iam
+  @aws_oidc {
+  "Always ResponseType.Error"
+  responseType: ResponseType!
+  "Human readable error message"
+  message: String
+}
+
+union UploadSubCatalogProductsResponse =
+    UploadSubCatalogProductsResult
+  | UploadSubCatalogProductsError
+
+union GetSubCatalogResponse = SubCatalog | NotFoundError
+
+union OrderCreatedResponse = Order | OrderCreatedError
+
+type Subscription @aws_cognito_user_pools @aws_iam @aws_oidc {
+  onNotificationCreate(userId: ID): Notification
+    @aws_subscribe(mutations: ["notificationCreate"])
+}
+
+enum ChatStatus {
+  active
+  archived
+  pending
+}
+
+enum OrderStatus {
+  confirmed
+  created
+}
+
+enum ChatType {
+  ordering
+  support
+}
+
+enum AddressSource {
+  google
+  custom
+}
+
+enum CutOffTimeType {
+  strict
+  flexible
+}
+
+enum SupplierDeliverySettingType {
+  supplier
+  chat
+}
+
+enum ResponseType {
+  success
+  error
+}
+
+enum MessageStatus {
+  delivered
+  readyForDelivery
+  pendingAttachment
+}
+
+enum MessageType {
+  text
+  media
+  orderConfirmation
+  broadcast
+  event
+}
+
+interface AppsyncResponse {
+  responseType: ResponseType!
+}
+
+interface AppsyncError {
+  "Always ResponseType.Error"
+  responseType: ResponseType!
+  "Human readable error message"
+  message: String
+}
+
+"""
+Error thrown by getInviteeBuyers when user is not found
+Be sure to always implement AppsyncError when creating
+Error type
+"""
+type InviteeNotFound implements AppsyncResponse & AppsyncError
+  @aws_cognito_user_pools
+  @aws_iam
+  @aws_oidc {
+  "Always ResponseType.Error"
+  responseType: ResponseType!
+  "Human readable error message"
+  message: String
+}
+
+type OrderCreatedError implements AppsyncResponse & AppsyncError
+  @aws_cognito_user_pools
+  @aws_iam
+  @aws_oidc {
+  "Always ResponseType.Error"
+  responseType: ResponseType!
+  "Human readable error message"
+  message: String
+}
+
+type CityWithOffsets @aws_cognito_user_pools @aws_iam @aws_oidc {
+  city: String
+  utcOffsets: [Int]
+}
+
+type BuyerFacetsResponse @aws_cognito_user_pools @aws_iam @aws_oidc {
+  country: String
+  cities: [CityWithOffsets!]
+}
+
+type NotFoundError implements AppsyncResponse & AppsyncError
+  @aws_cognito_user_pools
+  @aws_iam
+  @aws_oidc {
+  "Always ResponseType.Error"
+  responseType: ResponseType!
+  "Human readable error message"
+  message: String
+}
+
+type ChatNotFoundError implements AppsyncResponse & AppsyncError
+  @aws_cognito_user_pools
+  @aws_iam
+  @aws_oidc {
+  "Always ResponseType.Error"
+  responseType: ResponseType!
+  "Human readable error message"
+  message: String
+}
+
+union ChatSubCatalogProductsResponse =
+    ChatNotFoundError
+  | ValidationError
+  | ChatSubCatalogProductsError
+  | ProductSearchResult
+
+type ChatSubCatalogProductsError implements AppsyncResponse & AppsyncError
+  @aws_cognito_user_pools
+  @aws_iam
+  @aws_oidc {
+  "Always ResponseType.Error"
+  responseType: ResponseType!
+  "Human readable error message"
+  message: String
+}
+
+type SupplierNotFound implements AppsyncResponse & AppsyncError
+  @aws_cognito_user_pools
+  @aws_iam
+  @aws_oidc {
+  "Always ResponseType.Error"
+  responseType: ResponseType!
+  "Human readable error message"
+  message: String
+}
+
+type SupplierDeliverySettingsNotFound implements AppsyncResponse & AppsyncError
+  @aws_cognito_user_pools
+  @aws_iam
+  @aws_oidc {
+  "Always ResponseType.Error"
+  responseType: ResponseType!
+  "Human readable error message"
+  message: String
+}
+
+"""
+Errors thrown by userChats
+Be sure to always implement AppsyncError when creating
+Error type
+"""
+type UserChatsError implements AppsyncResponse & AppsyncError
+  @aws_cognito_user_pools
+  @aws_iam
+  @aws_oidc {
+  "Always ResponseType.Error"
+  responseType: ResponseType!
+  "Human readable error message"
+  message: String
+}
+
+union UserChatsResponse = UserChatConnection | UserChatsError
+
+type CreateProfileError implements AppsyncResponse & AppsyncError
+  @aws_cognito_user_pools
+  @aws_iam
+  @aws_oidc {
+  "Always ResponseType.Error"
+  responseType: ResponseType!
+  "Human readable error message"
+  message: String
+}
+
+type InvalidInvitedPhoneNumber implements AppsyncResponse & AppsyncError
+  @aws_cognito_user_pools
+  @aws_iam
+  @aws_oidc {
+  "Always ResponseType.Error"
+  responseType: ResponseType!
+  "Human readable error message"
+  message: String
+}
+
+type SubCatalog implements Node @aws_cognito_user_pools @aws_iam @aws_oidc {
   id: ID!
+  name: String!
+  supplierEntityId: String!
 }
 
-type Notification implements Node {
+type SubCatalogEdge implements Edge @aws_cognito_user_pools @aws_iam @aws_oidc {
+  cursor: String!
+  node: SubCatalog!
+}
+
+type SubCatalogConnection implements Connection
+  @aws_cognito_user_pools
+  @aws_iam
+  @aws_oidc {
+  edges: [SubCatalogEdge!]!
+}
+
+type InputValidationFailure implements AppsyncResponse & AppsyncError
+  @aws_cognito_user_pools
+  @aws_iam
+  @aws_oidc {
+  "Always ResponseType.Error"
+  responseType: ResponseType!
+  "Human readable error message"
+  message: String
+  invalidFields: [FieldValidationError!]
+}
+
+type ValidationError implements AppsyncResponse & AppsyncError
+  @aws_cognito_user_pools
+  @aws_iam
+  @aws_oidc
+  @deprecated(reason: "use InputValidationFailure instead") {
+  "Always ResponseType.Error"
+  responseType: ResponseType!
+  "Human readable error message"
+  message: String
+  invalidFields: [FieldValidationError!]
+}
+
+type FieldValidationError @aws_cognito_user_pools @aws_iam @aws_oidc {
+  fieldName: String!
+  "Computer readable error message"
+  reason: String!
+}
+
+type AuthorizationFailure implements AppsyncResponse & AppsyncError
+  @aws_cognito_user_pools
+  @aws_iam
+  @aws_oidc {
+  "ResponseType.Error"
+  responseType: ResponseType!
+  "User must be admin"
+  message: String
+}
+
+union ListSubCatalogsResponse = SubCatalogConnection | ValidationError
+
+type CutOffTime @aws_cognito_user_pools @aws_iam @aws_oidc {
+  type: CutOffTimeType!
+
+  "24 hour format UTC clock"
+  time: AWSTime!
+}
+
+type SupplierDeliverySetting @aws_cognito_user_pools @aws_iam @aws_oidc {
+  "supplier entity ID or chat ID"
+  id: ID!
+
+  cutOffTime: CutOffTime
+
+  "Sunday - Saturday : 0 - 6"
+  deliveryDays: [Int!]
+
+  type: SupplierDeliverySettingType!
+}
+
+type BatchUpdateOrderSupplier {
+  chatId: String
+  supplierId: String
+  "Number of orders updated with new supplier"
+  orderCount: Int
+}
+
+type Buyer implements Node @aws_cognito_user_pools @aws_iam @aws_oidc {
+  id: ID!
+  name: String!
+  displayName: String
+  referenceId: String
+  isTest: Boolean
+  fullAddress: String!
+  addressSource: AddressSource!
+  googlePlaceId: String
+  latitude: Float
+  longitude: Float
+  city: String
+  country: String
+  "offset from UTC in minutes"
+  utcOffset: Int
+  deliveryComment: String
+  createdAt: AWSTimestamp!
+  users(first: Int, after: String): BuyerUserConnection
+  profileImage: ProfileImage
+}
+
+type BuyerUser @aws_cognito_user_pools @aws_iam @aws_oidc {
+  buyerId: String!
+  userId: String!
+}
+
+type InvalidCursor implements AppsyncResponse & AppsyncError
+  @aws_cognito_user_pools
+  @aws_iam
+  @aws_oidc {
+  responseType: ResponseType!
+  message: String
+}
+
+union MetaLobbyResponse = MetaLobbyResult | InvalidCursor
+
+type MetaLobbyResult @aws_cognito_user_pools @aws_iam @aws_oidc {
+  buyers: UserLobbyBuyerConnection!
+  others: [String!] #list of buyer-less chat ids
+}
+
+type UserLobbyBuyerConnection implements Connection
+  @aws_cognito_user_pools
+  @aws_iam
+  @aws_oidc {
+  edges: [UserLobbyBuyerEdge!]
+}
+
+type UserLobbyBuyerEdge implements Edge
+  @aws_cognito_user_pools
+  @aws_iam
+  @aws_oidc {
+  cursor: String!
+  node: LobbyBuyer!
+}
+
+type UpdateSubCatalogError implements AppsyncResponse & AppsyncError
+  @aws_cognito_user_pools
+  @aws_iam
+  @aws_oidc {
+  "Always ResponseType.Error"
+  responseType: ResponseType!
+  "Human readable error message"
+  message: String
+}
+
+type CreateSubCatalogError implements AppsyncResponse & AppsyncError
+  @aws_cognito_user_pools
+  @aws_iam
+  @aws_oidc {
+  "Always ResponseType.Error"
+  responseType: ResponseType!
+  "Human readable error message"
+  message: String
+}
+
+union updateSubCatalogResponse = SubCatalog | UpdateSubCatalogError
+union createSubCatalogResponse = SubCatalog | CreateSubCatalogError
+
+type LobbyBuyer implements Node @aws_cognito_user_pools @aws_iam @aws_oidc {
+  id: ID!
+  buyer: Buyer!
+  chatIds: [String!]!
+}
+
+type Chat implements Node @aws_cognito_user_pools @aws_iam @aws_oidc {
+  id: ID!
+  chatName: String
+  restaurantName: String
+  deliveryAddress: String
+  buyer: Buyer
+  supplier: User
+  customerNumber: String
+  messages(
+    after: String
+    before: String
+    first: Int
+    last: Int
+  ): ChatMessageConnection!
+  users(first: Int, after: String): ChatUserConnection!
+  products: [Product!]
+  additionalEmails: [String]
+  enabled: Boolean!
+  salesforceId: String
+  status: ChatStatus!
+  type: ChatType
+  labels: [String!]
+  supplierCustomerName: String
+  isUserInChat(userId: ID!): Boolean
+  subCatalogId: ID
+}
+
+type ChatUserConnection implements Connection
+  @aws_cognito_user_pools
+  @aws_iam
+  @aws_oidc {
+  edges: [ChatUserEdge!]
+}
+
+type ChatUserEdge implements Edge @aws_cognito_user_pools @aws_iam @aws_oidc {
+  cursor: String!
+  node: User!
+}
+
+type ProductEdge implements Edge {
+  cursor: String!
+  node: Product!
+}
+
+type ProductConnection implements Connection {
+  edges: [ProductEdge!]!
+}
+
+type ChatMessageConnection implements Connection
+  @aws_cognito_user_pools
+  @aws_iam
+  @aws_oidc {
+  edges: [ChatMessageEdge!]
+}
+
+type ChatMessageEdge implements Edge
+  @aws_cognito_user_pools
+  @aws_iam
+  @aws_oidc {
+  cursor: String!
+  node: Message!
+}
+
+type Notification implements Node @aws_cognito_user_pools @aws_iam @aws_oidc {
   id: ID!
   userId: ID!
   message: Message!
 }
 
-type NotificationPreferences {
+enum EventType {
+  userRemovedFromChat
+  userAddedToChat
+  chatNameUpdated
+  chatCreated
+}
+
+type EventUser @aws_cognito_user_pools @aws_iam @aws_oidc {
+  id: ID
+  phone: String
+  name: String
+}
+
+type EventChat @aws_cognito_user_pools @aws_iam @aws_oidc {
+  chatId: ID
+  restaurantName: String
+  chatName: String
+  supplier: EventUser
+}
+
+union EventTarget = EventUser | EventChat
+
+type NotificationPreferences @aws_cognito_user_pools @aws_iam @aws_oidc {
   message: Boolean
   order: Boolean
 }
 
-input NotificationPreferencesInput {
-  type: String!
-  token: String!
-  message: Boolean!
-  order: Boolean!
-}
-
-type NoUnconnectedBuyers implements AppsyncResponse & AppsyncError {
+type BatchOrderConfirmError implements AppsyncResponse & AppsyncError
+  @aws_cognito_user_pools
+  @aws_iam
+  @aws_oidc {
+  "Always ResponseType.Error"
   responseType: ResponseType!
   message: String
 }
 
-type Order implements Node {
+type BatchOrderConfirmSuccess implements AppsyncResponse
+  @aws_cognito_user_pools
+  @aws_iam
+  @aws_oidc {
+  "Always ResponseType.Success"
+  responseType: ResponseType!
+}
+
+union BatchOrderConfirmResponse =
+    BatchOrderConfirmSuccess
+  | BatchOrderConfirmError
+
+union PushEndpointResponse = NotificationPreferences
+
+type Event @aws_cognito_user_pools @aws_iam @aws_oidc {
+  eventType: EventType!
+  target: [EventTarget]
+}
+
+type Media @aws_cognito_user_pools @aws_iam @aws_oidc {
+  url: String
+  uploadUrl: String
+  contentType: String
+}
+
+type BroadcastAttachment @aws_cognito_user_pools @aws_iam @aws_oidc {
+  media: Media
+  broadcastId: String
+  chatId: String
+  products: [Product!]
+}
+
+union Attachment = Event | Media | BroadcastAttachment
+
+type Message implements Node @aws_cognito_user_pools @aws_iam @aws_oidc {
+  id: ID!
+  body: String!
+  createdAt: AWSTimestamp!
+  user: User!
+  order: Order
+  chat: Chat!
+  attachment: Attachment
+  broadcastId: ID
+}
+
+enum BroadcastStatus {
+  draft
+  processing
+  sent
+  archived
+}
+
+type ChatLabelsResult @aws_cognito_user_pools @aws_iam @aws_oidc {
+  label: String
+  count: Int
+}
+
+type Broadcast implements Node @aws_cognito_user_pools @aws_iam @aws_oidc {
+  id: ID!
+  message: String
+  chatIds: [ID!]
+  chatLabels: [String!]
+  productIds: [String!]
+  products(offset: Int, size: Int): [Product!]
+  chats(offset: Int, size: Int): [Chat!]
+  createdAt: AWSTimestamp
+  status: BroadcastStatus!
+  senderUserId: ID
+  sender: User
+  supplierEntityId: ID
+  recipientCount: Int
+  attachment: Attachment
+}
+
+type SharedBroadcastProducts @aws_cognito_user_pools @aws_iam @aws_oidc {
+  products: [Product!]
+  categories: [ProductCategory!]
+  productCountInProductList: Int
+}
+
+type ProductCategory implements Node
+  @aws_cognito_user_pools
+  @aws_iam
+  @aws_oidc {
+  id: ID!
+  name: String
+}
+
+type UpdatedCategoryProduct @aws_cognito_user_pools @aws_iam @aws_oidc {
+  categoryId: ID!
+  productId: ID!
+}
+
+type CategoryProducts implements Node
+  @aws_cognito_user_pools
+  @aws_iam
+  @aws_oidc {
+  id: ID!
+  name: String
+  products: [Product!]
+}
+
+type Product implements Node @aws_cognito_user_pools @aws_iam @aws_oidc {
+  id: ID!
+  name: String!
+  unit: String
+  enabled: Boolean!
+  supplierId: ID
+  externalId: String
+  par: String
+  price: String
+  category: ProductCategory
+  """
+  Price in ¢
+
+  have in mind that different currencies might have different number of
+  significant digits (0, 2, 3, 4). Number represent the cost of the
+  smallest currency denominators
+
+  1.35 $ ->
+     cost = 135
+     currency = 'USD'
+
+  1.35 € ->
+     cost = 135
+     currency = 'EUR'
+
+  1.3 CLF ->
+     cost = 1300
+     currency = 'CLF'
+
+  135 GNF ->
+     cost = 135
+     currency = 'GNF'
+  """
+  cost: Int
+  "[ISO-4217](https://en.wikipedia.org/wiki/ISO_4217) currency code"
+  currency: String
+  primaryCatalogCategory: String
+  createdAt: AWSTimestamp
+  inProductList: Boolean
+
+  """
+  The number of days required for a supplier to first order a product
+  from a manufacturer before it can become available for order fulfilment
+  """
+  leadTime: Int
+
+  """
+  Place order for product on or before cutOffTime to ensure next day delivery
+  """
+  cutOffTime: AWSTime
+
+  "An optional description of the product"
+  description: String
+  subCatalogs: [String!]
+}
+
+type Order implements Node @aws_cognito_user_pools @aws_iam @aws_oidc {
   id: ID!
   referenceId: String
   chatId: String
@@ -773,206 +1029,145 @@ type Order implements Node {
   deliveryDate: AWSTimestamp
   createdAt: AWSTimestamp!
   confirmationTime: AWSTimestamp
-  pdf(downloadable: Boolean): String
+  "AWS S3 signed-url associated with the pdf for the order."
+  pdf(downloadable: Boolean = false): String
+  buyer: Buyer
+  chat: Chat
 }
 
-type OrderCreatedError implements AppsyncResponse & AppsyncError {
-  responseType: ResponseType!
-  message: String
-}
-
-union OrderCreatedResponse = Order | OrderCreatedError
-
-type OrderExportChocoEdiFormat {
-  qualifier: String!
-  value: String!
-}
-
-input OrderExportChocoEdiFormatInput {
-  qualifier: String!
-  value: String!
-}
-
-type OrderExportChocoSftpUpload {
-  type: String!
-  path: String!
-}
-
-input OrderExportChocoSftpUploadInput {
-  path: String!
-}
-
-type OrderExportConfig {
-  orderExportFormat: OrderExportConfigFormat!
-  orderExportUpload: OrderExportUploadOption!
-}
-
-input OrderExportConfigCreateInput {
-  orderExportFormat: OrderExportFormatInput!
-  orderExportUpload: OrderExportUploadInput
-}
-
-type OrderExportConfigCsvFormat {
-  type: String!
-  template: String
-  quotedString: Boolean
-  header: Boolean
-  dateFormat: String
-  delimiter: String
-}
-
-type OrderExportConfigEdiFormat {
-  type: String!
-  template: String
-  choco: OrderExportChocoEdiFormat
-  supplier: OrderExportSupplierEdiFormat
-}
-
-union OrderExportConfigFormat =
-    OrderExportConfigCsvFormat
-  | OrderExportConfigEdiFormat
-  | OrderExportConfigLobsterFormat
-
-type OrderExportConfigLobsterFormat {
-  type: String!
-}
-
-input OrderExportConfigUpdateInput {
-  orderExportFormat: OrderExportFormatInput
-  orderExportUpload: OrderExportUploadInput
-}
-
-input OrderExportCsvFormatInput {
-  template: OrderExportCsvTemplateOptions!
-}
-
-enum OrderExportCsvTemplateOptions {
-  StandardCsv
-  NECSCsv
-}
-
-input OrderExportEdiFormatInput {
-  template: OrderExportEdiTemplateOptions!
-  choco: OrderExportChocoEdiFormatInput
-  supplier: OrderExportSupplierEdiFormatInput
-}
-
-enum OrderExportEdiTemplateOptions {
-  CharliceProduceEdi
-  UsFoodsEdi
-  CustomEdi
-}
-
-type OrderExportExternalSftpUpload {
-  type: String!
-  host: String!
-  username: String
-  password: String
-  path: String!
-  port: Int
-  forceIPv4: Boolean
-  readyTimeout: Int
-  forceIPv6: Boolean
-  privateKey: String
-  passphrase: String
-}
-
-input OrderExportExternalSftpUploadInput {
-  host: String!
-  username: String!
-  password: String
-  path: String!
-  port: Int
-  forceIPv4: Boolean
-  readyTimeout: Int
-  forceIPv6: Boolean
-  privateKey: String
-  passphrase: String
-}
-
-input OrderExportFormatInput {
-  edi: OrderExportEdiFormatInput
-  csv: OrderExportCsvFormatInput
-  lobster: OrderExportLobsterFormatInput
-}
-
-input OrderExportLobsterFormatInput {
-  path: String!
-}
-
-type OrderExportLobsterUpload {
-  type: String!
-  path: String!
-}
-
-type OrderExportSupplierEdiFormat {
-  qualifier: String!
-  value: String!
-  name: String
-  productIdQualifier: String
-  nameReferenceQualifier: String
-}
-
-input OrderExportSupplierEdiFormatInput {
-  qualifier: String!
-  value: String!
-  name: String
-  productIdQualifier: String
-  nameReferenceQualifier: String
-}
-
-input OrderExportUploadInput {
-  chocoSftp: OrderExportChocoSftpUploadInput
-  externalSftp: OrderExportExternalSftpUploadInput
-}
-
-union OrderExportUploadOption =
-    OrderExportChocoSftpUpload
-  | OrderExportExternalSftpUpload
-  | OrderExportLobsterUpload
-
-input OrderInput {
-  id: ID
-  body: String
-  deliveryDate: AWSTimestamp
-  orderProducts: [OrderProductInput]
-}
-
-type OrderPreference {
-  pdf: Boolean
-  xlsx: Boolean
-  fax: String
-  sms: String
-  whatsApp: String
-  welcomeNotificationSent: AWSTimestamp
-}
-
-input OrderPreferenceInput {
-  pdf: Boolean
-  xlsx: Boolean
-  fax: String
-  sms: String
-  whatsApp: String
-}
-
-type OrderProduct {
+type OrderProduct @aws_cognito_user_pools @aws_iam @aws_oidc {
   product: Product!
   amount: Int!
 }
 
-input OrderProductInput {
-  product: ProductInput!
-  amount: Int!
+type ChatNotificationUserLists @aws_cognito_user_pools @aws_iam @aws_oidc {
+  "the user who is deselected from the supplier order preference"
+  deselectedUsersList: [ID!]!
+  deselectedUsers: [User!]!
+  "the user who wants to receive new order notification but not a supplier"
+  extraUsersList: [ID!]
+  extraUsers: [User!]
 }
 
-type OrderRestaurant implements Node {
+input ChatNotificationUserListsInput {
+  deselectedUsersList: [ID!]!
+  extraUsersList: [ID!]
+}
+
+"supplier new order notification preferences on a chat level"
+type ChatNotificationPreferences @aws_cognito_user_pools @aws_iam @aws_oidc {
+  "chat ID"
   id: ID!
-  restaurantName: String
-  deliveryAddress: String
-  customerNumber: String
+  newOrder: ChatNotificationUserLists
 }
 
-type OrderResult implements Node {
+input ListSubCatalogProductsInput @aws_cognito_user_pools @aws_iam @aws_oidc {
+  subCatalogId: ID!
+  search: String
+  filter: ProductFilter
+  sort: Sort
+  offset: Int
+  size: Int
+}
+
+input ChatSubCatalogProductsInput @aws_cognito_user_pools @aws_iam @aws_oidc {
+  chatId: ID!
+  search: String
+  filter: ProductFilter
+  sort: Sort
+  offset: Int
+  size: Int
+}
+
+type ProductSearchResult @aws_cognito_user_pools @aws_iam @aws_oidc {
+  total: Int!
+  hits: [Product!]!
+}
+
+type ListSubCatalogProductsError implements AppsyncResponse & AppsyncError
+  @aws_cognito_user_pools
+  @aws_iam
+  @aws_oidc {
+  "Always ResponseType.Error"
+  responseType: ResponseType!
+  "Human readable error message"
+  message: String
+}
+
+union ListSubCatalogProductsResponse =
+    ProductSearchResult
+  | ListSubCatalogProductsError
+
+input ChatNotificationInput {
+  "chat ID"
+  id: ID!
+  newOrder: ChatNotificationUserListsInput
+}
+
+input CutOffTimeInput {
+  type: CutOffTimeType!
+  "24 hour format UTC clock"
+  time: AWSTime!
+}
+
+input SupplierDeliverySettingInput {
+  "supplier entity ID or chat ID"
+  id: ID!
+  cutOffTime: CutOffTimeInput
+  "Sunday - Saturday : 0 - 6"
+  deliveryDays: [Int!]
+  type: SupplierDeliverySettingType!
+}
+
+input OrderSearchInput {
+  fromTime: AWSTimestamp
+  toTime: AWSTimestamp
+  offset: Int
+  size: Int
+}
+
+input BatchUpdateOrderSupplierInput {
+  chatId: String!
+  supplierId: String!
+  supplierRefId: String!
+  supplierPhone: String!
+}
+
+input BroadcastInput {
+  message: String
+  chatIds: [ID!]
+  chatLabels: [String!]
+  productIds: [String!]
+  sendToAll: Boolean
+  status: BroadcastStatus!
+  """
+  Set as true to send a message with a media attachment
+  The message will only be sent after media is put
+  to the attachment { uploadUrl } from the response
+  """
+  media: Boolean
+  """
+  A standard MIME type describing the format media attachment
+  see https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.17
+  """
+  mediaContentType: String
+}
+
+input CreateProfileInput {
+  id: String!
+  phone: String
+  email: String
+  name: String
+  businessName: String
+  position: String
+}
+
+type OrderSearchResult @aws_cognito_user_pools @aws_iam @aws_oidc {
+  total: Int!
+  hits: [OrderResult!]!
+}
+
+type OrderResult implements Node @aws_cognito_user_pools @aws_iam @aws_oidc {
   id: ID!
   referenceId: String
   orderProducts: [OrderProduct]
@@ -987,160 +1182,202 @@ type OrderResult implements Node {
   user: User
 }
 
-input OrderSearchInput {
-  fromTime: AWSTimestamp
-  toTime: AWSTimestamp
-  offset: Int
-  size: Int
-}
-
-type OrderSearchResult {
-  total: Int!
-  hits: [OrderResult!]!
-}
-
-type Product implements Node {
+type OrderRestaurant implements Node
+  @aws_cognito_user_pools
+  @aws_iam
+  @aws_oidc {
   id: ID!
-  name: String!
-  unit: String
-  enabled: Boolean!
-  supplierId: ID
-  externalId: String
-  par: String
-  price: String
-  category: ProductCategory
-  cost: Int
-  currency: String
-  primaryCatalogCategory: String
-  createdAt: AWSTimestamp
-  inProductList: Boolean
-  leadTime: Int
-  cutOffTime: AWSTime
-  description: String
+  restaurantName: String
+  deliveryAddress: String
+  customerNumber: String
 }
 
-type ProductCategory implements Node {
-  id: ID!
-  name: String
+type OrderPreference @aws_cognito_user_pools @aws_iam @aws_oidc {
+  pdf: Boolean
+  xlsx: Boolean
+  fax: String
+  sms: String
+  whatsApp: String
+  welcomeNotificationSent: AWSTimestamp
 }
 
-input ProductFilter {
-  supplierId: String
-  catalogCategory: String
-  enabled: Boolean
-}
-
-input ProductInput {
-  id: ID!
-  name: String!
-  enabled: Boolean
-  supplierId: ID
-  externalId: String
-  unit: String
-  par: String
-  category: CategoryInput
-  price: String
-  cost: Int
-  currency: String
-  primaryCatalogCategory: String
-  leadTime: Int
-  cutOffTime: AWSTime
-  description: String
-}
-
-input ProductsCategoryInput {
-  id: ID!
-  name: String
-  productIds: [ID!]!
-}
-
-type ProfileImage {
+type ProfileImage @aws_cognito_user_pools @aws_iam @aws_oidc {
+  "url to put new profile image file to"
   uploadUrl: String
+  "url of originally uploaded profile image"
   url: String
+  "url of 300x300 pixel crop of profile image"
   smallSquare: String
+  "url of 600x600 pixel crop of profile image"
   mediumSquare: String
+  "url of 900x900 pixel crop of profile image"
   largeSquare: String
+  "url of 60x60 pixel crop of profile image"
   smallThumbnail: String
+  "url of 120x120 pixel crop of profile image"
   mediumThumbnail: String
+  "url of 180x180 pixel crop of profile image"
   largeThumbnail: String
-}
-
-union PushEndpointResponse = NotificationPreferences
-
-enum PushNotificationPlatform {
-  android
-  ios
-}
-
-type Query {
-  broadcast(id: ID!): Broadcast!
-  buyer(id: ID, googlePlaceId: String): Buyer
-  buyerUsers(buyerId: ID, userId: ID, first: Int, after: String): [BuyerUser!]!
-  chat(id: ID, userIds: [ID]): Chat
-  chats(
-    userId: ID
-    after: String
-    before: String
-    first: Int
-    last: Int
-  ): UserChatConnection!
-  supplierChatLabels(
-    size: Int
-    after: String
-    asBotUser: Boolean
-  ): [ChatLabelsResult!]
-  message(id: ID!): Message
-  messages(
-    chatId: ID!
-    after: String
-    before: String
-    first: Int
-    last: Int
-  ): ChatMessageConnection!
-  order(id: ID, referenceId: String): Order
-  chatProducts(chatId: ID!): [Product!]
-  exportSupplierProducts(supplierId: ID!): [Product!]!
-  categoryProducts(chatId: ID!): [CategoryProducts!]!
-  user(id: ID, phone: String): User
-  supplier(id: ID, referenceId: String, botUserId: String): Supplier
-  search(query: SearchInput!): SearchResult!
-  orderSearch(query: OrderSearchInput!): OrderSearchResult!
-  isUserInChat(userId: ID!, chatId: ID!): Boolean!
-  bulkOrderPdf(orderIds: [ID!]!, downloadable: Boolean): String!
-  productListCategories(chatId: ID!): [ProductCategory!]
-  countSupplierChats(
-    supplierEntityId: String!
-    labels: [String!]
-    userId: String
-  ): Int!
-  broadcastAttachmentProducts(
-    broadcastId: ID!
-    chatId: ID!
-  ): BroadcastAttachmentProducts
-  blockedEmail(email: String!): BlockedEmail
-  blockedEmails(first: Int, after: String): BlockedEmailConnection
-  getInviteeBuyers(phone: String!): GetInviteeBuyersResponse
-  chatNotificationPreferences(id: ID!): ChatNotificationPreferences
-  supplierDeliverySetting(id: ID!): SupplierDeliverySetting
-  supplierNewOrderCheck(order: NewOrderInput!): SupplierNewOrderCheckResult!
-  getUnconnectedBuyerIds(
-    buyerIds: [String!]!
-    supplierId: String!
-  ): GetUnconnectedBuyerIdsResult!
-}
-
-type RemoveCCEmailFromChatsReport {
-  numberOfChatsUpdated: Int!
-}
-
-enum ResponseType {
-  success
-  error
 }
 
 enum Role {
   supplierSalesReps
   supplierAdmins
+}
+
+type InviteInfo @aws_cognito_user_pools @aws_iam @aws_oidc {
+  googlePlaceId: String
+  inviterUserId: String
+  googlePlaceName: String
+  googleFullAddress: String
+  latitude: Float
+  longitude: Float
+  city: String
+  country: String
+}
+
+type User implements Node @aws_cognito_user_pools @aws_iam @aws_oidc {
+  id: ID!
+  name: String
+  locale: String
+  phone: String!
+  "filename of image for internal use only"
+  image: String
+  email: String
+  createdAt: AWSTimestamp
+  hasAcceptedTermsAndConditions: Boolean!
+  pending: Boolean
+  buyers(first: Int, after: String): UserBuyerConnection
+  chats(
+    after: String
+    before: String
+    first: Int
+    last: Int
+  ): UserChatConnection!
+  businessName: String
+  cutOffTime: String
+  deliveryCosts: String
+  minOrderAmount: String
+  position: String
+  contacts: [User] @deprecated(reason: "use user { paginatedContacts } instead")
+  supplier: Boolean!
+  "To enable user login with daily code"
+  chocoUser: Boolean
+  suppliers: [User]
+  paginatedContacts(first: Int, after: String): UserUserConnection!
+  paginatedSuppliers(first: Int, after: String): UserUserConnection!
+  orderPreference: OrderPreference
+  supplierId: String
+  botUser: Boolean
+  profileImage: ProfileImage
+  role: [Role]
+  linkedSupplier: Supplier
+  "this flag is to enable proper data report on a user"
+  isTest: Boolean
+  inviteData: InviteInfo
+  translationLanguage: String
+}
+
+union UserSearchResponse =
+    UserSearchConnection
+  | InputValidationFailure
+  | AuthorizationFailure
+
+type UserSearchConnection implements Connection
+  @aws_cognito_user_pools
+  @aws_iam {
+  total: Int!
+  edges: [UserSearchEdge!]!
+  "All new connections must require it"
+  pageInfo: PageInfo!
+}
+
+type UserSearchEdge implements Edge @aws_cognito_user_pools @aws_iam {
+  cursor: String!
+  node: User!
+}
+
+type UserLead @aws_cognito_user_pools @aws_iam @aws_oidc {
+  phoneNumber: String!
+  requests: [UserLeadRequest]
+  requestCount: Int
+}
+
+type UserLeadRequest @aws_cognito_user_pools @aws_iam @aws_oidc {
+  createdAt: AWSTimestamp!
+  name: String
+  companyName: String
+  role: String
+  email: String
+  referrer: String
+}
+
+type Contact @aws_cognito_user_pools @aws_iam @aws_oidc {
+  phone: String!
+  ownerId: ID!
+  user: User!
+  Image: String
+}
+
+type UserBuyerConnection implements Connection
+  @aws_cognito_user_pools
+  @aws_iam
+  @aws_oidc {
+  edges: [UserBuyerEdge!]!
+}
+
+type UserBuyerEdge implements Edge @aws_cognito_user_pools @aws_iam @aws_oidc {
+  cursor: String!
+  node: Buyer!
+}
+
+type BuyerUserConnection implements Connection
+  @aws_cognito_user_pools
+  @aws_iam
+  @aws_oidc {
+  edges: [BuyerUserEdge!]!
+}
+
+type BuyerUserEdge implements Edge @aws_cognito_user_pools @aws_iam @aws_oidc {
+  cursor: String!
+  node: User!
+}
+
+type UserChatConnection implements Connection
+  @aws_cognito_user_pools
+  @aws_iam
+  @aws_oidc {
+  edges: [UserChatEdge!]
+}
+
+type UserChatEdge implements Edge @aws_cognito_user_pools @aws_iam @aws_oidc {
+  cursor: String!
+  node: Chat!
+}
+
+type UserUserConnection implements Connection
+  @aws_cognito_user_pools
+  @aws_iam
+  @aws_oidc {
+  edges: [UserUserEdge!]
+}
+
+type UserUserEdge implements Edge @aws_cognito_user_pools @aws_iam @aws_oidc {
+  cursor: String!
+  node: User!
+}
+
+type SearchResult @aws_cognito_user_pools @aws_iam @aws_oidc {
+  total: Int!
+  hits: [SearchItem!]!
+}
+
+type SearchItem @aws_cognito_user_pools @aws_iam @aws_oidc {
+  id: ID!
+  type: SearchEntityType!
+  title: String
+  description: String
+  entity: SearchEntity
 }
 
 union SearchEntity =
@@ -1164,50 +1401,42 @@ enum SearchEntityType {
   buyer
 }
 
-input SearchFilter {
-  user: UserFilter
-  product: ProductFilter
-  chat: ChatFilter
-  broadcast: BroadcastFilter
+enum IntegrationType {
+  sms
+  email
+  fax
+  whatsApp
 }
 
-input SearchInput {
-  search: String!
-  type: SearchEntityType
-  offset: Int
-  size: Int
-  filter: SearchFilter
-  sort: Sort
+type IntegrationSmsOption @aws_cognito_user_pools @aws_iam @aws_oidc {
+  type: IntegrationType!
+  phone: String!
 }
 
-type SearchItem {
-  id: ID!
-  type: SearchEntityType!
-  title: String
-  description: String
-  entity: SearchEntity
+type IntegrationEmailOption @aws_cognito_user_pools @aws_iam @aws_oidc {
+  type: IntegrationType!
+  emailAddress: String!
+  xlsx: Boolean!
+  pdf: Boolean!
 }
 
-type SearchResult {
-  total: Int!
-  hits: [SearchItem!]!
+type IntegrationFaxOption @aws_cognito_user_pools @aws_iam @aws_oidc {
+  type: IntegrationType!
+  phone: String!
 }
 
-input Sort {
-  field: String!
-  order: SortOrder!
+type IntegrationWhatsAppOption @aws_cognito_user_pools @aws_iam @aws_oidc {
+  type: IntegrationType!
+  phone: String!
 }
 
-enum SortOrder {
-  desc
-  asc
-}
+union IntegrationOption =
+    IntegrationSmsOption
+  | IntegrationEmailOption
+  | IntegrationFaxOption
+  | IntegrationWhatsAppOption
 
-type Subscription {
-  onNotificationCreate(userId: ID): Notification
-}
-
-type Supplier {
+type Supplier @aws_cognito_user_pools @aws_iam @aws_oidc {
   id: ID!
   referenceId: String!
   name: String!
@@ -1227,141 +1456,617 @@ type Supplier {
   orderExportFormat: OrderExportConfigFormat
   orderExportUpload: OrderExportUploadOption
   hasEnabledCatalogProducts: Boolean!
+  "Paginated list of users connected to the supplier"
   users(after: String, before: String, first: Int): SupplierUserConnection
+  "IANA timezone code, e.g: Europe/Berlin"
+  timezone: String
+  defaultSubCatalog: String
+  noDefaultCatalog: Boolean
+  "short description of supplier to be shown during supplier discovery"
+  description: String
+  "indicates whether a suppler can be discovered via search"
+  isDiscoverable: Boolean
+  coverPhoto: ProfileImage
 }
 
-input SupplierCreateInput {
-  id: String!
-  name: String!
-  integration: [IntegrationOptionInput!]!
-  locale: String!
-  cutOffTime: String
-  deliveryCosts: String
-  isTest: Boolean
-  minOrderAmount: String
-  allowCustomProducts: Boolean
-  customerNumberMandatory: Boolean
-  deliveryDateMandatory: Boolean
-  phone: String
+"ORDER EXPORT CONFIG STARTS HERE .........."
+enum OrderExportCsvTemplateOptions {
+  StandardCsv
+  NECSCsv
 }
 
-type SupplierDeliverySetting {
-  id: ID!
-  cutOffTime: CutOffTime
-  deliveryDays: [Int!]
-  type: SupplierDeliverySettingType!
+enum OrderExportEdiTemplateOptions {
+  CharliceProduceEdi
+  UsFoodsEdi
+  CustomEdi
 }
 
-input SupplierDeliverySettingInput {
-  id: ID!
-  cutOffTime: CutOffTimeInput
-  deliveryDays: [Int!]
-  type: SupplierDeliverySettingType!
+type OrderExportChocoEdiFormat @aws_cognito_user_pools @aws_iam {
+  qualifier: String!
+  value: String!
 }
 
-enum SupplierDeliverySettingType {
-  supplier
-  chat
+type OrderExportSupplierEdiFormat @aws_cognito_user_pools @aws_iam {
+  qualifier: String!
+  value: String!
+  name: String
+  productIdQualifier: String
+  nameReferenceQualifier: String
 }
 
-union SupplierInviteResponseEntity = User | Chat
+type OrderExportConfigCsvFormat @aws_cognito_user_pools @aws_iam {
+  type: String!
+  template: String
+  quotedString: Boolean
+  header: Boolean
+  dateFormat: String
+  delimiter: String
+}
 
-type SupplierInviteUserResponse {
+type OrderExportConfigEdiFormat @aws_cognito_user_pools @aws_iam {
+  type: String!
+  template: String
+  choco: OrderExportChocoEdiFormat
+  supplier: OrderExportSupplierEdiFormat
+}
+
+type OrderExportConfigLobsterFormat {
+  type: String!
+}
+
+type OrderExportChocoSftpUpload @aws_cognito_user_pools @aws_iam {
+  type: String!
+  path: String!
+}
+
+type OrderExportExternalSftpUpload @aws_cognito_user_pools @aws_iam {
+  type: String!
+  host: String!
+  username: String
+  password: String
+  path: String!
+  port: Int
+  forceIPv4: Boolean
+  readyTimeout: Int
+  forceIPv6: Boolean
+  privateKey: String
+  passphrase: String
+}
+
+type OrderExportLobsterUpload @aws_cognito_user_pools @aws_iam {
+  type: String!
+  path: String!
+}
+
+union OrderExportConfigFormat =
+    OrderExportConfigCsvFormat
+  | OrderExportConfigEdiFormat
+  | OrderExportConfigLobsterFormat
+
+union OrderExportUploadOption =
+    OrderExportChocoSftpUpload
+  | OrderExportExternalSftpUpload
+  | OrderExportLobsterUpload
+
+type OrderExportConfig @aws_cognito_user_pools @aws_iam @aws_oidc {
+  orderExportFormat: OrderExportConfigFormat!
+  orderExportUpload: OrderExportUploadOption!
+}
+
+input OrderExportChocoEdiFormatInput {
+  qualifier: String!
+  value: String!
+}
+
+input OrderExportSupplierEdiFormatInput {
+  qualifier: String!
+  value: String!
+  name: String
+  productIdQualifier: String
+  nameReferenceQualifier: String
+}
+
+input OrderExportCsvFormatInput {
+  template: OrderExportCsvTemplateOptions!
+}
+
+input OrderExportEdiFormatInput {
+  template: OrderExportEdiTemplateOptions!
+  choco: OrderExportChocoEdiFormatInput
+  supplier: OrderExportSupplierEdiFormatInput
+}
+
+input OrderExportLobsterFormatInput {
+  path: String!
+}
+
+input OrderExportFormatInput {
+  edi: OrderExportEdiFormatInput
+  csv: OrderExportCsvFormatInput
+  lobster: OrderExportLobsterFormatInput
+}
+
+input OrderExportChocoSftpUploadInput {
+  path: String!
+}
+
+input OrderExportExternalSftpUploadInput {
+  host: String!
+  username: String!
+  password: String
+  path: String!
+  port: Int
+  forceIPv4: Boolean
+  readyTimeout: Int
+  forceIPv6: Boolean
+  privateKey: String
+  passphrase: String
+}
+
+input OrderExportUploadInput {
+  chocoSftp: OrderExportChocoSftpUploadInput
+  externalSftp: OrderExportExternalSftpUploadInput
+}
+
+input OrderExportConfigCreateInput {
+  orderExportFormat: OrderExportFormatInput!
+  orderExportUpload: OrderExportUploadInput
+}
+
+input OrderExportConfigUpdateInput {
+  orderExportFormat: OrderExportFormatInput
+  orderExportUpload: OrderExportUploadInput
+}
+
+"ORDER EXPORT CONFIG ENDS HERE ........."
+union SupplierInviteResponseEntity = User | Chat | InvalidInvitedPhoneNumber
+
+union CreateProfileResponse = User | BuyerExists | CreateProfileError
+
+type BuyerExists @aws_cognito_user_pools @aws_iam {
+  message: String
+}
+
+type ChatUser @aws_cognito_user_pools @aws_iam @aws_oidc {
+  userId: String
+  chatId: String
+}
+
+type SupplierInviteUserResponse @aws_cognito_user_pools @aws_iam @aws_oidc {
   chatUsers: [ChatUser]!
   inviteResponse: [SupplierInviteResponseEntity]!
 }
 
-type SupplierNewOrderCheckResult {
-  accept: Boolean!
-  reason: String!
-}
+union ActivateChatResponse = Chat
 
-input SupplierUpdateInput {
-  id: String!
-  name: String!
-  integration: [IntegrationOptionInput!]!
-  locale: String!
-  cutOffTime: String
-  deliveryCosts: String
-  isTest: Boolean
-  minOrderAmount: String
-  allowCustomProducts: Boolean
-  customerNumberMandatory: Boolean
-  deliveryDateMandatory: Boolean
-  phone: String
-}
-
-type SupplierUserConnection implements Connection {
+type SupplierUserConnection implements Connection
+  @aws_cognito_user_pools
+  @aws_iam
+  @aws_oidc {
   edges: [SupplierUserEdge!]
 }
 
-type SupplierUserEdge implements Edge {
+type SupplierUserEdge implements Edge
+  @aws_cognito_user_pools
+  @aws_iam
+  @aws_oidc {
   cursor: String!
   node: User!
 }
 
+type ImportSupplierProductsReport @aws_cognito_user_pools @aws_iam @aws_oidc {
+  "Number of products that will be created"
+  new: Int
+  "Number of products that will be disabled"
+  disabled: Int
+  "Number of products that have failed validation"
+  invalid: Int
+  "Number of products that will be updated"
+  updated: Int
+  "Number of products that will not be affected"
+  unchanged: Int
+}
+
+type RemoveCCEmailFromChatsReport @aws_cognito_user_pools @aws_iam @aws_oidc {
+  numberOfChatsUpdated: Int!
+}
+
+type BlockedEmail implements Node @aws_cognito_user_pools @aws_iam {
+  id: ID!
+  email: String!
+  reason: String
+  createdAt: AWSTimestamp
+}
+
+type BlockedEmailConnection implements Connection
+  @aws_cognito_user_pools
+  @aws_iam
+  @aws_oidc {
+  edges: [BlockedEmailEdge!]
+}
+
+type BlockedEmailEdge implements Edge
+  @aws_cognito_user_pools
+  @aws_iam
+  @aws_oidc {
+  cursor: String!
+  node: BlockedEmail!
+}
+
+type InviteeBuyers @aws_cognito_user_pools @aws_iam {
+  "User Id of Invitee"
+  id: ID!
+  "Invitee Buyers which the invitor does not have a chat with"
+  unconnectedBuyers(first: Int, after: String): UserBuyerConnection!
+}
+
+union GetInviteeBuyersResponse = InviteeNotFound | InviteeBuyers
+
+type SupplierDeliveryDateSettings @aws_cognito_user_pools @aws_iam {
+  "Supplier time zone"
+  timezone: String!
+  "CutOffTime configuration for supplier"
+  cutOffTime: CutOffTime
+  "Available delivery dates for supplier within the next 30 days in UTC && YYYY-MM-DD format"
+  deliveryDates: [AWSDate!]
+}
+
+union SupplierDeliveryDateSettingsResponse =
+    SupplierDeliveryDateSettings
+  | SupplierNotFound
+  | SupplierDeliverySettingsNotFound
+
 type UnconnectedBuyers {
+  "List of buyer ids supplier is not connected with"
   buyerIds: [String!]!
 }
 
-type UpdatedCategoryProduct {
-  categoryId: ID!
-  productId: ID!
+type NoUnconnectedBuyers implements AppsyncResponse & AppsyncError
+  @aws_cognito_user_pools
+  @aws_iam
+  @aws_oidc {
+  "Always ResponseType.Error"
+  responseType: ResponseType!
+  message: String
 }
 
-type User implements Node {
+union GetUnconnectedBuyerIdsResult = UnconnectedBuyers | NoUnconnectedBuyers
+
+type SupplierNewOrderCheckResult @aws_cognito_user_pools @aws_iam @aws_oidc {
+  accept: Boolean!
+  reason: String!
+}
+
+type MessageEvent @aws_cognito_user_pools @aws_iam @aws_oidc {
+  eventType: String!
+  target: [EventTarget]
+}
+
+"""
+For internal use,
+This type is kept exactly similar to the message table schema since it is used as is in choco-notification
+"""
+type MessagesFromChatResult @aws_cognito_user_pools @aws_iam @aws_oidc {
+  id: String!
+  body: String!
+  chatId: String!
+  createdAt: AWSTimestamp!
+  userId: String!
+  orderId: String
+  supplierOptIn: Boolean
+  status: MessageStatus
+  media: Boolean
+  recipients: [String]
+  mediaContentType: String
+  type: MessageType
+  event: MessageEvent
+  broadcastId: String
+}
+
+enum TransmissionOfType {
+  order
+}
+
+enum TransmissionToType {
+  email
+  sms
+  whatsapp
+}
+
+type TransmissionEvent implements Node
+  @aws_cognito_user_pools
+  @aws_iam
+  @aws_oidc {
+  "A concatenation of ofId:timestamp:toType:to:newState (NOT a UUID), which uniquely IDs every transmission"
   id: ID!
-  name: String
-  locale: String
-  phone: String!
-  image: String
-  email: String
-  createdAt: AWSTimestamp
-  hasAcceptedTermsAndConditions: Boolean!
-  pending: Boolean
-  buyers(first: Int, after: String): UserBuyerConnection
-  chats(
-    after: String
-    before: String
-    first: Int
-    last: Int
-  ): UserChatConnection!
-  businessName: String
-  cutOffTime: String
-  deliveryCosts: String
-  minOrderAmount: String
-  position: String
-  contacts: [User] @deprecated(reason: "use user { paginatedContacts } instead")
-  supplier: Boolean!
-  chocoUser: Boolean
-  suppliers: [User]
-  paginatedContacts(first: Int, after: String): UserUserConnection!
-  paginatedSuppliers(first: Int, after: String): UserUserConnection!
-  orderPreference: OrderPreference
-  supplierId: String
-  botUser: Boolean
-  profileImage: ProfileImage
-  role: [Role]
-  linkedSupplier: Supplier
+  "e.g. an orderId for ofIdType: order"
+  ofId: ID!
+  ofIdType: TransmissionOfType!
+  "e.g. an email address for toType: email"
+  to: String!
+  toType: TransmissionToType!
+  "e.g. Send, Delivery, Bounce, Read, ..."
+  newState: String!
+  isDeliveryEvent: Boolean
+  isFailureEvent: Boolean
+  timestamp: AWSDateTime!
+  "arbitrary metadata, e.g. email bounce details"
+  metaData: AWSJSON
+}
+
+input BuyerCreateInput {
+  name: String!
+  displayName: String
+  fullAddress: String!
+  """
+  Addresses with source 'google' must have a googlePlaceId, latitude and longitude;
+  addresses with source 'custom' must not have any of these.
+  """
+  addressSource: AddressSource!
+  googlePlaceId: String
+  latitude: Float
+  longitude: Float
+  city: String
+  country: String
+  "offset from UTC in minutes"
+  utcOffset: Int
+  deliveryComment: String
   isTest: Boolean
 }
 
-type UserBuyerConnection implements Connection {
-  edges: [UserBuyerEdge!]!
+input BuyerUpdateInput {
+  name: String
+  displayName: String
+  fullAddress: String
+  """
+  Addresses with source 'google' must have a googlePlaceId, latitude and longitude;
+  addresses with source 'custom' must not have any of these.
+  """
+  addressSource: AddressSource
+  googlePlaceId: String
+  latitude: Float
+  longitude: Float
+  city: String
+  country: String
+  "offset from UTC in minutes"
+  utcOffset: Int
+  deliveryComment: String
+  isTest: Boolean
 }
 
-type UserBuyerEdge implements Edge {
-  cursor: String!
-  node: Buyer!
+input ChatCreateInput {
+  userIds: [ID]!
+  chatName: String
+  restaurantName: String
+  deliveryAddress: String
+  buyerId: ID
+  supplierId: ID
+  customerNumber: String
+  additionalEmails: [String]
+  status: ChatStatus
+  salesforceId: String
+    @deprecated(
+      reason: "temporary field needed for seeding buyer migration data"
+    )
+  type: ChatType
+  products: [AdminProductInput!]
+  supplierCustomerName: String
+  labels: [String!]
+  subCatalogId: ID
 }
 
-type UserChatConnection implements Connection {
-  edges: [UserChatEdge!]
+input ChatUpdateInput {
+  chatName: String
+  restaurantName: String
+  deliveryAddress: String
+  supplierId: ID
+  customerNumber: String
+  additionalEmails: [String]
+  status: ChatStatus
+  salesforceId: String
+  labels: [String!]
+  subCatalogId: ID
+  buyerId: ID
 }
 
-type UserChatEdge implements Edge {
-  cursor: String!
-  node: Chat!
+input ChatInviteInput {
+  userName: String
+  smsMessage: String
+  restaurantName: String
+  deliveryAddress: String
+  customerNumber: String
+  googlePlaceId: String
+  googlePlaceName: String
+  googlefullAddress: String
+  latitude: Float
+  longitude: Float
+  city: String
+  country: String
+  state: String
+  street: String
+  postalCode: String
+  "offset from UTC in minutes"
+  utcOffset: Int
+  products: [AdminProductInput!]
+  labels: [String!]
+  teamMembers: [String!]
+  subCatalogId: ID
+}
+
+input MessageInput {
+  id: ID!
+  body: String!
+  "Flag to prevent message from sending to chat supplier"
+  supplierOptIn: Boolean
+  """
+  Set as true to send a message with a media attachment
+  The message will only be sent after media is put
+  to the attachment { uploadUrl } from the response
+  """
+  media: Boolean
+  """
+  A standard MIME type describing the format media attachment
+  see https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.17
+  """
+  mediaContentType: String
+  """
+  Only infra request can set the value, otherwise it should be undefined
+  """
+  type: String
+  broadcastId: String
+}
+
+input OrderInput {
+  id: ID
+  body: String
+  deliveryDate: AWSTimestamp
+  orderProducts: [OrderProductInput]
+}
+
+input NewOrderInput {
+  id: ID
+  chatId: ID!
+  supplierId: ID!
+  userId: ID!
+  supplierRefId: ID
+  body: String
+  deliveryDate: AWSTimestamp
+  orderProducts: [OrderProductInput]
+}
+
+input OrderProductInput {
+  product: ProductInput!
+  amount: Int!
+}
+
+input ProductsCategoryInput {
+  id: ID!
+  name: String
+  productIds: [ID!]!
+}
+
+input CategoryInput {
+  id: ID!
+  name: String
+}
+
+input ProductInput {
+  id: ID!
+  name: String!
+  enabled: Boolean
+  supplierId: ID
+  externalId: String
+  unit: String
+  par: String
+  category: CategoryInput
+  price: String
+  """
+  Price in ¢
+
+  have in mind that different currencies might have different number of
+  significant digits (0, 2, 3, 4). Number represent the cost of the
+  smallest currency denominators
+
+  1.35 $ ->
+     cost = 135
+     currency = 'USD'
+
+  1.35 € ->
+     cost = 135
+     currency = 'EUR'
+
+  1.3 CLF ->
+     cost = 1300
+     currency = 'CLF'
+
+  135 GNF ->
+     cost = 135
+     currency = 'GNF'
+  """
+  cost: Int
+  "[ISO-4217](https://en.wikipedia.org/wiki/ISO_4217) currency code"
+  currency: String
+  primaryCatalogCategory: String
+  leadTime: Int
+  cutOffTime: AWSTime
+  description: String
+  subCatalogs: [ID!]
+}
+
+input AdminProductInput {
+  name: String
+  enabled: Boolean
+  supplierId: ID
+  externalId: ID
+  unit: String
+  par: String
+  category: String
+  price: String
+  """
+  Price in ¢
+
+  have in mind that different currencies might have different number of
+  significant digits (0, 2, 3, 4). Number represent the cost of the
+  smallest currency denominators
+
+  1.35 $ ->
+     cost = '135'
+     currency = 'USD'
+
+  1.35 € ->
+     cost = '135'
+     currency = 'EUR'
+
+  1.3 CLF ->
+     cost = '1300'
+     currency = 'CLF'
+
+  135 GNF ->
+     cost = '135'
+     currency = 'GNF'
+
+  Products with the cost:'135.45' will be considered invalid
+  """
+  cost: String
+  "[ISO-4217](https://en.wikipedia.org/wiki/ISO_4217) currency code"
+  currency: String
+  primaryCatalogCategory: String
+  leadTime: Int
+  cutOffTime: AWSTime
+  description: String
+  subCatalogs: [ID!]
+}
+
+input OrderPreferenceInput {
+  pdf: Boolean
+  xlsx: Boolean
+  fax: String
+  sms: String
+  whatsApp: String
+  welcomeNotificationSent: AWSTimestamp
+}
+
+input UserUpdateInput {
+  id: String!
+  phone: String
+  email: String
+  name: String
+  image: String
+    @deprecated(reason: "use profileImage { uploadUrl } from type User")
+  businessName: String
+  cutOffTime: String
+    @deprecated(reason: "use SupplierDeliverySetting { cutOffTime } instead")
+  deliveryCosts: String
+  minOrderAmount: String
+  position: String
+  chocoUser: Boolean
+  supplier: Boolean
+  locale: String
+  hasAcceptedTermsAndConditions: Boolean
+  orderPreference: OrderPreferenceInput
+  supplierId: String
+  isTest: Boolean
+  translationLanguage: String
 }
 
 input UserCreateInput {
@@ -1370,8 +2075,10 @@ input UserCreateInput {
   name: String!
   email: String
   image: String
+    @deprecated(reason: "use profileImage { uploadUrl } from type User")
   businessName: String
   cutOffTime: String
+    @deprecated(reason: "use SupplierDeliverySetting { cutOffTime } instead")
   deliveryCosts: String
   minOrderAmount: String
   position: String
@@ -1383,16 +2090,11 @@ input UserCreateInput {
   botUser: Boolean
   isTest: Boolean
   pending: Boolean
+  translationLanguage: String
 }
 
-input UserFilter {
-  isSupplier: Boolean
-}
-
-type UserLead {
-  phoneNumber: String!
-  requests: [UserLeadRequest]
-  requestCount: Int
+input UserSearchInput {
+  keywords: String
 }
 
 input UserLeadInput {
@@ -1404,40 +2106,172 @@ input UserLeadInput {
   referrer: String
 }
 
-type UserLeadRequest {
-  createdAt: AWSTimestamp!
-  name: String
-  companyName: String
-  role: String
-  email: String
-  referrer: String
+enum PushNotificationPlatform {
+  android
+  ios
 }
 
-input UserUpdateInput {
-  id: String!
-  phone: String
-  email: String
-  name: String
-  image: String
-  businessName: String
-  cutOffTime: String
-  deliveryCosts: String
-  minOrderAmount: String
-  position: String
-  chocoUser: Boolean
-  supplier: Boolean
-  locale: String
-  hasAcceptedTermsAndConditions: Boolean
-  orderPreference: OrderPreferenceInput
+input CreatePushEndpointInput {
+  type: PushNotificationPlatform!
+  "unique identifier created by the notification service for an app on a device"
+  token: String!
+  "indicates whether a user would like to recieve message notifications"
+  message: Boolean!
+  "indicates whether a user would like to recieve order notifications"
+  order: Boolean!
+}
+
+input NotificationPreferencesInput {
+  type: String!
+  token: String!
+  message: Boolean!
+  order: Boolean!
+}
+
+input UserFilter {
+  isSupplier: Boolean
+}
+
+input ProductFilter {
   supplierId: String
+  catalogCategory: String
+  enabled: Boolean
+}
+
+input BroadcastFilter {
+  status: [BroadcastStatus]
+  senderUserId: ID
+  supplierEntityId: ID
+}
+
+input ChatFilter {
+  chatName: String
+  restaurantName: String
+  labels: [String!]
+  "used in conjunction with labels filter and used by infra to fetch supplier chatLabels"
+  supplierEntityId: String
+  "userId for salesReps and botUserId for supplierAdmins; applicable for infra or admin"
+  userId: String
+  additionalEmail: String
+  enabled: Boolean
+  buyerId: String
+}
+
+input OrderFilter {
+  startDate: AWSTimestamp
+  endDate: AWSTimestamp
+  status: OrderStatus
+}
+
+input BuyerFilter {
+  country: String
+  city: String
+  utcOffset: Int
+}
+
+input SearchFilter {
+  user: UserFilter
+  product: ProductFilter
+  chat: ChatFilter
+  broadcast: BroadcastFilter
+  order: OrderFilter
+  buyer: BuyerFilter
+}
+
+enum SortOrder {
+  desc
+  asc
+}
+
+input Sort {
+  field: String!
+  order: SortOrder!
+}
+
+input SearchInput {
+  search: String!
+  type: SearchEntityType
+  offset: Int
+  size: Int
+  filter: SearchFilter
+  sort: Sort
+}
+
+input IntegrationSmsOptionInput {
+  type: IntegrationType!
+  phone: String!
+}
+
+input IntegrationEmailOptionInput {
+  type: IntegrationType!
+  emailAddress: String!
+  xlsx: Boolean!
+  pdf: Boolean!
+}
+
+input IntegrationFaxOptionInput {
+  type: IntegrationType!
+  phone: String!
+}
+
+input IntegrationWhatsAppOptionInput {
+  type: IntegrationType!
+  phone: String!
+}
+
+input IntegrationOptionInput {
+  sms: IntegrationSmsOptionInput
+  email: IntegrationEmailOptionInput
+  fax: IntegrationFaxOptionInput
+  whatsApp: IntegrationWhatsAppOptionInput
+}
+
+input SupplierCreateInput {
+  id: String!
+  name: String!
+  integration: [IntegrationOptionInput!]!
+  locale: String!
+  cutOffTime: String
+    @deprecated(reason: "use SupplierDeliverySetting { cutOffTime } instead")
+  deliveryCosts: String
   isTest: Boolean
+  minOrderAmount: String
+  allowCustomProducts: Boolean
+  customerNumberMandatory: Boolean
+  deliveryDateMandatory: Boolean
+  phone: String
+  "IANA timezone code, e.g: Europe/Berlin"
+  timezone: String
+  defaultSubCatalog: String
+  noDefaultCatalog: Boolean
+  description: String
+  isDiscoverable: Boolean
 }
 
-type UserUserConnection implements Connection {
-  edges: [UserUserEdge!]
+input SupplierUpdateInput {
+  id: String!
+  name: String!
+  integration: [IntegrationOptionInput!]!
+  locale: String!
+  cutOffTime: String
+    @deprecated(reason: "use SupplierDeliverySetting { cutOffTime } instead")
+  deliveryCosts: String
+  isTest: Boolean
+  minOrderAmount: String
+  allowCustomProducts: Boolean
+  customerNumberMandatory: Boolean
+  deliveryDateMandatory: Boolean
+  phone: String
+  "IANA timezone code, e.g: Europe/Berlin"
+  timezone: String
+  defaultSubCatalog: String
+  noDefaultCatalog: Boolean
+  description: String
+  isDiscoverable: Boolean
 }
 
-type UserUserEdge implements Edge {
-  cursor: String!
-  node: User!
+schema {
+  query: Query
+  mutation: Mutation
+  subscription: Subscription
 }
