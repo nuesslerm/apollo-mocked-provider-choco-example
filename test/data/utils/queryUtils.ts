@@ -1,4 +1,4 @@
-import { OrderType } from '.';
+import { OrderType } from '../types';
 import { get } from './get';
 
 export type OrderHit = {

@@ -1,7 +1,7 @@
 import React from 'react';
-import { createApolloLoadingProvider } from '../src';
+import { createApolloLoadingProvider } from '../../src';
 import { render } from '@testing-library/react';
-import UserTest from './UserTest';
+import UserTest from '../UserTest';
 
 test('works with defaults', async () => {
   const MockedProvider = createApolloLoadingProvider();

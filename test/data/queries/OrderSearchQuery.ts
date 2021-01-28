@@ -1,5 +1,5 @@
 import gql from 'graphql-tag';
-import OrderType from '../OrderType';
+import OrderType from '../types/OrderType';
 
 export type OrderHit = {
   entity: OrderType;

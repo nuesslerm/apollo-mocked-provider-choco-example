@@ -5,12 +5,12 @@ import {
   OrderSearchQueryVariablesType,
   OrderHit,
 } from './queries';
-import { get } from './get';
+import { get } from './utils/get';
 import {
   CollectionName,
   CollectionKey,
   updateQueryCollection,
-} from './queryUtils';
+} from './utils/queryUtils';
 import { fetchMoreOrders } from './updateCollectionUtils';
 
 const extractOrdersIds = (hit: OrderHit) => hit.entity.id;

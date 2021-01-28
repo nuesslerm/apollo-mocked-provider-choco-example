@@ -1,15 +1,15 @@
 import React from 'react';
-import { createApolloMockedProvider } from '../src';
+import { createApolloMockedProvider } from '../../src';
 import { readFileSync } from 'fs';
 import { render, waitFor } from '@testing-library/react';
-import UserTest from './UserTest';
+import UserTest from '../UserTest';
 import path from 'path';
-import OrdersPage from './OrdersPage';
+import OrdersPage from '../OrdersPage';
 import { MockList } from 'graphql-tools';
-import { fetchTypeDefs } from '../src/fetchTypeDefs';
+import { fetchTypeDefs } from '../../src/fetchTypeDefs';
 
 const typeDefs = readFileSync(
-  path.join(__dirname, 'fixtures/chocoSchema.graphql'),
+  path.join(__dirname, '../data/chocoSchema.graphql'),
   'utf8'
 );
 

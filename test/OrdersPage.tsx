@@ -1,5 +1,5 @@
 import React, { FC /* useState */ } from 'react';
-import useOrderSearchQuery from './fixtures/useOrderSearchQuery';
+import useOrderSearchQuery from './data/useOrderSearchQuery';
 
 const orderSearchQueryVariables = {
   search: '',

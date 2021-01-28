@@ -1,4 +1,4 @@
-import OrderType from './OrderType';
+import OrderType from './types/OrderType';
 import { OrderSearchQueryVariablesType } from './queries';
 
 type FetchMoreOrdersType = {
