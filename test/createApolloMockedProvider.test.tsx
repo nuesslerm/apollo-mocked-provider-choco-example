@@ -6,6 +6,7 @@ import UserTest from './UserTest';
 import path from 'path';
 import OrdersPage from './OrdersPage';
 import { MockList } from 'graphql-tools';
+import { fetchTypeDefs } from '../src/fetchTypeDefs';
 
 const typeDefs = readFileSync(
   path.join(__dirname, 'fixtures/chocoSchema.graphql'),
@@ -15,7 +16,8 @@ const typeDefs = readFileSync(
 // console.log('typeDefs', typeDefs);
 
 test('works with defaults', async () => {
-  const MockedProvider = createApolloMockedProvider(typeDefs);
+  const fetchedTypeDefs = await fetchTypeDefs();
+  const MockedProvider = createApolloMockedProvider(fetchedTypeDefs);
 
   const { getByTestId } = render(
     <MockedProvider>
