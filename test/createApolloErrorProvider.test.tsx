@@ -1,7 +1,7 @@
 import React from 'react';
 import { createApolloErrorProvider } from '../src';
 import { render, waitFor } from '@testing-library/react';
-import { TodoApp } from './Todo';
+import UserTest from './UserTest';
 import { GraphQLError } from 'graphql';
 
 test('works with defaults', async () => {
@@ -12,7 +12,7 @@ test('works with defaults', async () => {
         new GraphQLError('Something terrible happened on the way to the moon.'),
       ]}
     >
-      <TodoApp id={'hello'} />
+      <UserTest id={'hello'} />
     </MockedProvider>
   );
 

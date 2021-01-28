@@ -1,6 +1,5 @@
-import * as Sentry from '@sentry/browser';
+import OrderType from './OrderType';
 import { OrderSearchQueryVariablesType } from './queries';
-import { OrderType } from '../domain';
 
 type FetchMoreOrdersType = {
   variables: OrderSearchQueryVariablesType;
@@ -25,10 +24,6 @@ export const fetchMoreOrders = ({
         },
         updateQuery,
       });
-    } catch (err) {
-      Sentry.captureException(new Error(err));
-      // TODO: raise a toastr here use sentry
-      // See depending issues below
-    }
+    } catch (err) {}
   };
 };

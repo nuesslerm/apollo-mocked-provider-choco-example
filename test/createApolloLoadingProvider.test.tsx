@@ -1,13 +1,13 @@
 import React from 'react';
 import { createApolloLoadingProvider } from '../src';
 import { render } from '@testing-library/react';
-import { TodoApp } from './Todo';
+import UserTest from './UserTest';
 
 test('works with defaults', async () => {
   const MockedProvider = createApolloLoadingProvider();
   const { getByText } = render(
     <MockedProvider>
-      <TodoApp id={'dafsdf'} />
+      <UserTest id={'dafsdf'} />
     </MockedProvider>
   );
 

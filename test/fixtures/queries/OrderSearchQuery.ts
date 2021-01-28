@@ -1,7 +1,5 @@
 import gql from 'graphql-tag';
-import { SearchFilter } from '@chocoapp/appsync-client/dist/code/types';
-
-import { OrderType } from '../../domain';
+import OrderType from '../OrderType';
 
 export type OrderHit = {
   entity: OrderType;
@@ -18,24 +16,12 @@ export type OrderSearchQueryVariablesType = {
   search: string;
   offset: number;
   size: number;
-  filter: SearchFilter;
 };
 
 export const OrderSearchQuery = gql`
-  query OrderSearch(
-    $search: String!
-    $offset: Int
-    $size: Int
-    $filter: SearchFilter
-  ) {
+  query OrderSearch($search: String!, $offset: Int, $size: Int) {
     search(
-      query: {
-        search: $search
-        type: order
-        offset: $offset
-        size: $size
-        filter: $filter
-      }
+      query: { search: $search, type: order, offset: $offset, size: $size }
     ) {
       total
       hits {

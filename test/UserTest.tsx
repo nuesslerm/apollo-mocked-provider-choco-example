@@ -21,12 +21,14 @@ export interface GetUser {
   };
 }
 
-export const TodoApp = ({ id }: { id: string }) => {
+const UserTest = ({ id }: { id: string }) => {
   const { loading, error, data } = useQuery<GetUser>(GET_USER_QUERY, {
     variables: { id },
   });
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error! ({error.message})</p>;
-  return <>{data && <ul data-testid="todolist">{data.user.name}</ul>}</>;
+  return <>{data && <ul data-testid="usertest">{data.user.name}</ul>}</>;
 };
+
+export default UserTest;

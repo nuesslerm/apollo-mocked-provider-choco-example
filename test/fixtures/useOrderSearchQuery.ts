@@ -1,4 +1,4 @@
-import { useQuery } from '@apollo/react-hooks';
+import { useQuery } from '@apollo/client';
 import {
   OrderSearchQuery,
   OrderSearchQueryType,
@@ -38,6 +38,8 @@ export default function useOrderSearchQuery(
     errorPolicy: 'all',
     variables,
   });
+
+  // console.log(data, loading, error, fetchMore);
 
   const total = get(data, 'search.total', undefined) || 0;
   const hits = get(data, 'search.hits', undefined) || [];
